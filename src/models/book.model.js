@@ -13,7 +13,6 @@ const bookSchema = new mongoose.Schema(
     },
     bookCoverImgUrl: {
       type: String,
-      default: "https://example.com/default-cover.jpg",
     },
     authorId: {
       type: mongoose.Schema.Types.ObjectId,

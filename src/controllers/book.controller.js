@@ -11,8 +11,9 @@ const createBook = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Title and description are required");
   }
 
-  //Todo: add book cover image URL
-  // const bookCoverImgUrl = req.file.path;
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can create books");
+  }
 
   const coverImageLocal = req.file;
 
@@ -74,6 +75,9 @@ const updateBook = asyncHandler(async (req, res) => {
   if (!title && !description) {
     throw new ApiError(400, "Title and description are required");
   }
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can update books");
+  }
 
   const book = await Book.findByIdAndUpdate(
     bookId,
@@ -94,6 +98,10 @@ const deleteBook = asyncHandler(async (req, res) => {
   if (!isValidObjectId(bookId)) {
     throw new ApiError(400, "Invalid book ID");
   }
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can remove books");
+  }
+
   const deletedBook = await Book.findByIdAndDelete(bookId);
   if (!deletedBook) {
     throw new ApiError(404, "Book not found");

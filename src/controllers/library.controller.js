@@ -11,6 +11,10 @@ const createLibrary = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Name and description are required");
   }
 
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only author can create library");
+  }
+
   const library = await Library.create({ name, description, location });
 
   if (!library) {
@@ -67,6 +71,9 @@ const updateLibrary = asyncHandler(async (req, res) => {
   if (!name && !description && !location) {
     throw new ApiError(400, "Name, description or location is required");
   }
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can modify library");
+  }
 
   const updatedLibrary = await Library.findByIdAndUpdate(
     libraryId,
@@ -94,6 +101,9 @@ const deleteLibrary = asyncHandler(async (req, res) => {
   const { libraryId } = req.params;
   if (!isValidObjectId(libraryId)) {
     throw new ApiError(400, "Invalid library ID");
+  }
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can delete library");
   }
 
   const library = await Library.findByIdAndDelete(libraryId);
