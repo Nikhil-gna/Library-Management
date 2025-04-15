@@ -3,6 +3,7 @@ import { Book } from "../models/book.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import { uploadFileToFirebase } from "../utils/firebaseFileUpload.js";
 
 const createBook = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
@@ -13,10 +14,19 @@ const createBook = asyncHandler(async (req, res) => {
   //Todo: add book cover image URL
   // const bookCoverImgUrl = req.file.path;
 
+  const coverImageLocal = req.file;
+
+  let imageUrl = process.env.DEFAULT_BOOK_COVER_URL;
+
+  if (coverImageLocal) {
+    imageUrl = await uploadFileToFirebase(coverImageLocal, "bookCovers");
+  }
+
   const book = await Book.create({
     title,
     description,
     authorId: req.user._id,
+    bookCoverImgUrl: imageUrl,
   });
   if (!book) {
     throw new ApiError(400, "Book not created");

@@ -21,6 +21,7 @@ import healthCheck from "./routes/healthcheck.routes.js";
 import libraryRouter from "./routes/library.routes.js";
 import bookRouter from "./routes/book.routes.js";
 import libraryInventoryRouter from "./routes/libraryInventory.routes.js";
+import borrowRouter from "./routes/borrow.routes.js";
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -33,5 +34,6 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/libraries", libraryRouter);
 app.use("/api/v1/libraries", libraryInventoryRouter);
 app.use("/api/v1/books", bookRouter);
+app.use("/api/v1/borrow", borrowRouter);
 
 export { app };

@@ -34,11 +34,22 @@ const addBookToLibrary = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid library ID");
   }
 
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can modify library inventory");
+  }
+
   const addBook = await Library.findByIdAndUpdate(
     libraryId,
     { $addToSet: { books: bookId } },
     { new: true }
-  ).populate("books", ["title", "authorId", "borrowerId", "isAvailable"]);
+  ).populate({
+    path: "books",
+    select: "title authorId borrowerId isAvailable",
+    populate: {
+      path: "authorId",
+      select: "username",
+    },
+  });
 
   if (!addBook) {
     throw new ApiError(404, "Library not found");
@@ -54,11 +65,22 @@ const removeBookFromLibrary = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid library ID");
   }
 
+  if (req.user.role !== "author") {
+    throw new ApiError(403, "Only authors can modify library inventory");
+  }
+
   const removeBook = await Library.findByIdAndUpdate(
     libraryId,
     { $pull: { books: bookId } },
     { new: true }
-  ).populate("books", ["title", "authorId", "borrowerId", "isAvailable"]);
+  ).populate({
+    path: "books",
+    select: "title authorId borrowerId isAvailable",
+    populate: {
+      path: "authorId",
+      select: "username",
+    },
+  });
 
   if (!removeBook) {
     throw new ApiError(404, "Library not found");
